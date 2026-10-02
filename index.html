@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A browser-based LSTM writing companion that helps you continue a thought, one word at a time."
+    />
+    <meta name="theme-color" content="#f7f8fc" />
+    <title>Next Thought — LSTM Sentence Generator</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Next Thought home">
+          <span class="brand-mark" aria-hidden="true">✳</span>
+          <span>next<span class="brand-light">thought</span></span>
+        </a>
+        <span class="model-status" id="model-status" role="status">
+          <span class="status-dot" aria-hidden="true"></span>
+          Loading your writing companion…
+        </span>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-title">
+          <p class="eyebrow">Your AI writing companion</p>
+          <h1 id="hero-title">Your next thought,<br /><span>starts here.</span></h1>
+          <p class="hero-copy">
+            Start with a few words. Let your LSTM find what comes next and help
+            you turn a spark into a sentence.
+          </p>
+        </section>
+
+        <section class="workspace" aria-label="Sentence generator">
+          <div class="prompt-label-row">
+            <label for="seed-text">What are you thinking?</label>
+            <span class="private-note"><span aria-hidden="true">◉</span> Runs privately in your browser</span>
+          </div>
+          <textarea
+            id="seed-text"
+            rows="3"
+            maxlength="1000"
+            placeholder="Try: once upon a time..."
+            spellcheck="false"
+          ></textarea>
+
+          <div class="actions">
+            <button class="button button-primary" id="generate-button" type="button" disabled>
+              <span aria-hidden="true">✦</span> Continue my thought
+            </button>
+            <button class="button button-secondary" id="predict-button" type="button" disabled>
+              See next-word ideas
+            </button>
+          </div>
+
+          <p class="error-message" id="error-message" role="alert" hidden></p>
+          <section class="result-card" id="result-card" aria-live="polite" hidden>
+            <p class="result-eyebrow" id="result-eyebrow"></p>
+            <p class="result-text" id="result-text"></p>
+          </section>
+          <section class="ideas-section" id="ideas-section" aria-live="polite" hidden>
+            <h2>Next-word ideas</h2>
+            <ol class="ideas-list" id="ideas-list"></ol>
+          </section>
+        </section>
+
+        <details class="settings">
+          <summary><span aria-hidden="true">⚙</span> Generation settings</summary>
+          <div class="settings-grid">
+            <label class="setting-control" for="word-count">
+              <span class="setting-heading">Words to generate <output id="word-count-value">10</output></span>
+              <input id="word-count" type="range" min="1" max="50" value="10" />
+            </label>
+            <label class="toggle-control" for="sampling-toggle">
+              <span class="toggle-copy">
+                <strong>Add randomness</strong>
+                <span>Sample different possible words</span>
+              </span>
+              <input id="sampling-toggle" type="checkbox" />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+            <label class="setting-control temperature-control" for="temperature">
+              <span class="setting-heading">Temperature <output id="temperature-value">1.0</output></span>
+              <input id="temperature" type="range" min="0.2" max="1.5" step="0.1" value="1.0" disabled />
+              <span class="setting-hint">Lower is more predictable; higher is more surprising.</span>
+            </label>
+          </div>
+          <p class="model-note">The model runs on your device. Your text is not sent to a server.</p>
+        </details>
+      </main>
+
+      <footer class="footer">
+        <span>Powered by an LSTM language model</span>
+        <span>Made for the moments before the next word.</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

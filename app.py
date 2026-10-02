@@ -14,6 +14,137 @@ MAXLEN_PATH = "max_len.pickle"
 
 st.set_page_config(page_title="LSTM Sentence Generator", page_icon="✍️", layout="centered")
 
+st.html(
+    """
+    <style>
+    :root {
+        --ink: #172033;
+        --muted: #68738a;
+        --accent: #6259e8;
+        --line: #e8eaf2;
+        --surface: #ffffff;
+    }
+    html {
+        color-scheme: light;
+    }
+    html, body, .stApp, [data-testid="stAppViewContainer"] {
+        background:
+            radial-gradient(ellipse at 50% -15%, rgba(115, 104, 255, .13), transparent 42%),
+            #f7f8fc !important;
+        color: var(--ink) !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
+    [data-testid="stHeader"] { background: transparent !important; }
+    [data-testid="stMainBlockContainer"] {
+        max-width: 820px;
+        padding-top: 2.5rem;
+        padding-bottom: 4rem;
+    }
+    [data-testid="stSidebar"] {
+        background: #fff !important;
+        border-right: 1px solid var(--line);
+    }
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] h2 {
+        color: var(--ink) !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {
+        font-family: 'Manrope', sans-serif;
+        letter-spacing: -.03em;
+    }
+    .eyebrow {
+        color: var(--accent);
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        margin: 0 0 .8rem;
+    }
+    .hero-title {
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        font-size: clamp(2.2rem, 6vw, 3.6rem);
+        font-weight: 800;
+        letter-spacing: -.065em;
+        line-height: 1.08;
+        margin: 0;
+        color: #172033 !important;
+    }
+    .hero-title span {
+        color: var(--accent);
+    }
+    .hero-copy {
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 590px;
+        margin: 1rem auto 0;
+    }
+    .hero {
+        text-align: center;
+        padding: 1.4rem 1rem 2rem;
+        margin-bottom: 1rem;
+    }
+    .input-card, [data-testid="stVerticalBlockBorderWrapper"] {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 14px 40px rgba(32, 42, 76, .06);
+        padding: 1.35rem 1.5rem;
+    }
+    [data-testid="stTextInput"] label p {
+        font-size: .92rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    [data-testid="stTextInput"] input {
+        min-height: 3.35rem;
+        border-radius: 12px;
+        border-color: #dfe2ed !important;
+        background: #fbfbfe !important;
+        color: var(--ink) !important;
+        font-size: 1rem;
+    }
+    [data-testid="stTextInput"] input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+    }
+    .stButton > button {
+        min-height: 3.05rem;
+        border-radius: 11px;
+        font-weight: 700;
+        border-color: #e2e4ee !important;
+        background: #fff !important;
+        color: var(--ink) !important;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        border-color: var(--accent);
+        box-shadow: 0 7px 18px rgba(98, 89, 232, .14);
+    }
+    .stButton > button[kind="primary"] {
+        background: var(--accent) !important;
+        border-color: var(--accent) !important;
+        color: #fff !important;
+    }
+    [data-testid="stSlider"] [role="slider"] {
+        background: var(--accent);
+    }
+    [data-testid="stAlert"] {
+        border-radius: 12px;
+    }
+    @media (max-width: 640px) {
+        [data-testid="stMainBlockContainer"] {
+            padding: 1rem 1rem 2.5rem;
+        }
+        .hero { padding: 1.6rem .2rem 1rem; }
+        .hero-copy { font-size: .96rem; }
+        [data-testid="stVerticalBlockBorderWrapper"] { padding: 1rem; }
+    }
+    </style>
+    """,
+)
+
 
 # ---------------------------------------------------------------------------
 # Load model + tokenizer + max_len once, then cache across reruns
@@ -81,8 +212,17 @@ def generate_sentence(seed_text: str, num_words: int, temperature: float = 1.0) 
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
-st.title("✍️ LSTM Next-Word Sentence Generator")
-st.caption("Type a starting phrase — the model predicts the next word, then feeds its own output back in to build out a full sentence.")
+st.markdown(
+    """
+    <section class="hero">
+      <p class="eyebrow">AI writing companion</p>
+      <h1 class="hero-title">Your next thought,<br><span>starts here.</span></h1>
+      <p class="hero-copy">Give the LSTM a few words. It will predict what comes next
+      and help you turn a spark into a sentence.</p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
 
 with st.sidebar:
     st.header("Settings")
@@ -97,11 +237,16 @@ with st.sidebar:
     st.caption(f"Vocabulary size: {model.output_shape[-1]}")
     st.caption(f"Padded sequence length: {max_len}")
 
-seed_text = st.text_input("Start typing a sentence:", placeholder="e.g. once upon a time")
+with st.container(border=True):
+    seed_text = st.text_input(
+        "What are you thinking?",
+        placeholder="Try: once upon a time...",
+        help="Enter a starting phrase for the model to continue.",
+    )
 
 col1, col2 = st.columns(2)
-generate_clicked = col1.button("Generate full sentence", type="primary", use_container_width=True)
-predict_clicked = col2.button("Predict next word only", use_container_width=True)
+generate_clicked = col1.button("✨  Continue my thought", type="primary", use_container_width=True)
+predict_clicked = col2.button("See next-word ideas", use_container_width=True)
 
 if generate_clicked:
     if not seed_text.strip():
@@ -110,7 +255,8 @@ if generate_clicked:
         with st.spinner("Generating..."):
             result = generate_sentence(seed_text, num_words, temperature if use_sampling else 1.0)
         st.success("Done!")
-        st.markdown(f"**Generated text:**\n\n> {result}")
+        st.markdown("#### Your completed thought")
+        st.markdown(f"> {result}")
 
 if predict_clicked:
     if not seed_text.strip():
@@ -119,7 +265,7 @@ if predict_clicked:
         preds = predict_next_word_probs(seed_text)
         top_n = 5
         top_indices = preds.argsort()[-top_n:][::-1]
-        st.markdown("**Top predicted next words:**")
+        st.markdown("#### Next-word ideas")
         for idx in top_indices:
             word = index_to_word.get(int(idx), "<unk>")
             st.write(f"- **{word}** — {preds[idx] * 100:.2f}%")
